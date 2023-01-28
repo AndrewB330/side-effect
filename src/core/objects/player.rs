@@ -1,27 +1,21 @@
-use crate::shape::Quad;
+use crate::core::direction::SceneDirection;
+use crate::core::shape;
+use crate::states::GameWorldState;
 use bevy::prelude::*;
 use bevy::sprite::Mesh2dHandle;
+use bevy::utils::HashMap;
 use bevy_rapier2d::prelude::*;
-use crate::core::direction::SceneDirection;
-use crate::states::GameWorldState;
-
-#[derive(Clone, Debug, Default)]
-pub enum Shape {
-    #[default]
-    Square,
-    Circle,
-    Triangle,
-    Star,
-    Pentagon,
-}
+use crate::core::objects::shape::PlayerShape;
 
 #[derive(Component, Clone, Debug, Default)]
 pub struct Player {
     pub id: u32,
-    pub shape: Shape,
+    pub current_shape_index: u32,
     pub max_speed: f32,
     pub max_acceleration: f32,
     pub jump_impulse: f32,
+    pub meshes: HashMap<PlayerShape, Handle<Mesh>>,
+    pub available_shapes: Vec<PlayerShape>,
 }
 
 pub struct PlayerPlugin;
@@ -31,9 +25,14 @@ impl Plugin for PlayerPlugin {
         app.add_system_set(
             SystemSet::on_update(GameWorldState::GameWorld)
                 .with_system(move_player)
+                .with_system(change_shape)
                 .with_system(jump_player),
         );
     }
+}
+
+fn change_shape() {
+
 }
 
 fn move_player(
@@ -45,15 +44,14 @@ fn move_player(
     )>,
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
-    context: Res<RapierContext>,
     config: ResMut<RapierConfiguration>,
 ) {
-    let gravity_direction = SceneDirection::from_gravity_direction(&*config);
+    let gravity_direction = config.gravity.normalize();
 
     for (mut impulse, velocity, mass, mut player) in players.iter_mut() {
         let mut target_velocity = 0.0;
 
-        let right = gravity_direction.get_perp().get_vec();
+        let right = gravity_direction.perp();
         let mut dir = Vec2::ZERO;
 
         if keys.any_pressed([KeyCode::A]) {
@@ -78,7 +76,6 @@ fn move_player(
     }
 }
 
-
 fn find_obstacle(
     entity: Entity,
     direction: SceneDirection,
@@ -98,12 +95,10 @@ fn find_obstacle(
 
     for i in 0..INTERVALS {
         let t = (i as f32 / (INTERVALS - 1) as f32) * 1.8 - 0.9;
-        let origin =
-            position + direction.get_vec() * du + direction.get_perp().get_vec() * t * dv;
+        let origin = position + direction.get_vec() * du + direction.get_perp().get_vec() * t * dv;
         let dir = direction.get_vec();
 
-        let filter = QueryFilter::new()
-            .exclude_collider(entity);
+        let filter = QueryFilter::new().exclude_collider(entity);
 
         if let Some((e, d)) = context.cast_ray(origin, dir, 100.0, true, filter) {
             if let Some((_, prev)) = res.clone() {

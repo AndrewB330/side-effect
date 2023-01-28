@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use objects::player::PlayerPlugin;
 
+pub mod direction;
 pub mod objects;
 pub mod scene_builder;
-pub mod direction;
 
 pub struct CorePlugin;
 

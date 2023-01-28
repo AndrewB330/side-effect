@@ -1,4 +1,4 @@
-use crate::core::objects::player::{Player, Shape};
+use crate::core::objects::player::{Player};
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
@@ -18,7 +18,7 @@ pub struct WallBundle {
 pub struct Wall;
 
 impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
-    pub fn spawn_wall_from_to(&mut self, mut from: Vec2, mut to: Vec2) {
+    pub fn spawn_wall_from_to(&mut self, from: Vec2, to: Vec2) {
         let size = from.max(to) - from.min(to);
         let translation = (from + to) * 0.5;
         self.commands.spawn_bundle(WallBundle {

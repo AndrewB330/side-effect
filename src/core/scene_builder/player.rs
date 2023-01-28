@@ -1,8 +1,9 @@
-use crate::core::objects::player::{Player, Shape};
+use crate::core::objects::player::{Player};
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
 use bevy::sprite::Mesh2dHandle;
 use bevy_rapier2d::prelude::*;
+use crate::core::objects::shape::PlayerShape;
 
 #[derive(Bundle, Default)]
 pub struct PlayerBundle {
@@ -28,16 +29,19 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
     pub fn spawn_player(&mut self, position: Vec2, id: u32) {
         let player = Player {
             id,
-            shape: Shape::Square,
+            current_shape_index: 0,
             max_speed: 2.,
             max_acceleration: 18.0,
             jump_impulse: 6.,
+            meshes: self.player_meshes.clone(),
+            available_shapes: vec![PlayerShape::Square, PlayerShape::Circle]
         };
 
         self.commands.spawn(PlayerBundle {
             player,
             collider: Collider::cuboid(0.5, 0.5),
-            mesh: self.meshes
+            mesh: self
+                .meshes
                 .add(shape::Quad::new(Vec2::new(1.0, 1.0)).into())
                 .into(),
             material: self.materials.add(Color::rgb_u8(33, 41, 128).into()),
