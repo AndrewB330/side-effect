@@ -47,15 +47,17 @@ impl SceneDirection {
     }
 
     pub fn from_gravity_direction(config: &RapierConfiguration) -> Self {
-        let dir = config.gravity.normalize();
-        if dir.y > 0.1 {
-            return SceneDirection::Up;
-        }
-        if dir.x < -0.1 {
-            return SceneDirection::Left;
-        }
-        if dir.x > 0.1 {
-            return SceneDirection::Right;
+        if config.gravity.length() > 0.01 {
+            let dir = config.gravity.normalize();
+            if dir.y > 0.1 {
+                return SceneDirection::Up;
+            }
+            if dir.x < -0.1 {
+                return SceneDirection::Left;
+            }
+            if dir.x > 0.1 {
+                return SceneDirection::Right;
+            }
         }
         return SceneDirection::Down;
     }
