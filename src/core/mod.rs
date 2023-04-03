@@ -2,6 +2,7 @@ use crate::core::materials::player_material::PlayerMaterial;
 use crate::core::objects::shape::ShapePlugin;
 use bevy::prelude::*;
 use bevy::sprite::Material2dPlugin;
+use bevy_prototype_debug_lines::DebugLinesPlugin;
 use bevy_rapier2d::prelude::*;
 use objects::player::PlayerPlugin;
 
@@ -26,6 +27,7 @@ impl Plugin for CorePlugin {
             ..default()
         });
 
+        app.add_plugin(DebugLinesPlugin::default());
         app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
         app.add_plugin(Material2dPlugin::<PlayerMaterial>::default());
         app.add_plugin(PlayerPlugin);

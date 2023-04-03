@@ -3,6 +3,7 @@ use crate::core::direction::SceneDirection;
 
 use crate::states::GameWorldState;
 use bevy::prelude::*;
+use bevy_prototype_debug_lines::DebugLines;
 
 use crate::core::objects::shape::{PlayerShape, PlayerShapeVisualBundleCache, MAX_SIDES};
 use crate::core::objects::side_effect::SideEffect;
@@ -33,6 +34,7 @@ impl Plugin for PlayerPlugin {
             move_player.run_if(in_state(GameWorldState::GameWorld)),
             jump_player.run_if(in_state(GameWorldState::GameWorld)),
             update_side_effects.run_if(in_state(GameWorldState::GameWorld)),
+            draw_lines.run_if(in_state(GameWorldState::GameWorld)),
         ));
     }
 }
@@ -276,6 +278,20 @@ fn find_obstacle(
             filter,
         )
         .map(|(e, toi)| (e, toi.toi))
+}
+
+fn draw_lines(mut lines: ResMut<DebugLines>, players: Query<&Transform, With<Player>>,
+              windows: Query<&Window>,
+              camera: Query<(&Camera, &GlobalTransform)>,) {
+    let window = windows.single();
+    let (camera, camera_transform) = camera.single();
+    if let Some(cursor) = window.cursor_position() {
+        for t in &players {
+            lines.line(t.translation, camera.viewport_to_world_2d(camera_transform, cursor).unwrap().extend(0.0), 0.0);
+        }
+    } else {
+        // cursor is not inside the window
+    }
 }
 
 fn jump_player(
