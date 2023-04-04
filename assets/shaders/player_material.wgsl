@@ -3,7 +3,7 @@
 
 struct ColorMaterial {
     color: vec4<f32>,
-    sides: array<vec4<u32>, 10>,
+    sides: array<vec4<u32>, 4>,
     // 'flags' is a bit field indicating various options. u32 is 32 bits so we have up to 32 options.
     flags: u32,
 };
@@ -63,7 +63,32 @@ fn get_effect_color(side_index: i32, uvi: vec2<f32>) -> vec4<f32> {
 
     var effect = material.sides[side_index].x;
 
-    return textureSample(player_effect_texture, player_effect_texture_sampler, vec2(uv.x / 2.0, (uv.y + f32(effect)) / 4.0));
+    var color = textureSample(player_effect_texture, player_effect_texture_sampler, vec2(max(uv.x, 0.5) / 4.0, (uv.y + f32(effect)) / 8.0));
+    let emissive = textureSample(player_effect_texture, player_effect_texture_sampler, vec2((uv.x - 0.5) / 4.0, (uv.y + f32(effect)) / 8.0));
+    if emissive.a > 0.0 {
+        color = vec4(color.rgb + emissive.rgb * 25.0, color.a);
+    }
+    return color;
+}
+
+fn get_effect_addon_color(side_index: i32, uvi: vec2<f32>) -> vec4<f32> {
+    var uv = unrot(uvi);
+    if (side_index >= 1) {uv = rot(uv);};
+    if (side_index >= 2) {uv = rot(uv);};
+    if (side_index >= 3) {uv = rot(uv);};
+
+    var effect = material.sides[side_index].x;
+    //return vec4(uv.x, uv.x, uv.x, 1.0);
+    var color = textureSample(player_effect_texture, player_effect_texture_sampler, vec2((min(uv.x, 0.4) + 1.0) / 4.0, (uv.y + f32(effect)) / 8.0));
+    let emissive = textureSample(player_effect_texture, player_effect_texture_sampler, vec2((uv.x + 1.5) / 4.0, (uv.y + f32(effect)) / 8.0));
+    if emissive.a > 0.0 {
+        color = vec4(color.rgb + emissive.rgb * 25.0, color.a);
+    }
+    if any(abs(uv - 0.5) > 0.5) {
+        return vec4(0.0);
+    } else {
+        return color;
+    }
 }
 
 fn get_effect_corner_color(side_index: i32, uvi: vec2<f32>) -> vec4<f32> {
@@ -74,7 +99,7 @@ fn get_effect_corner_color(side_index: i32, uvi: vec2<f32>) -> vec4<f32> {
 
     var effect = material.sides[side_index].x;
 
-    var color = textureSample(player_effect_texture, player_effect_texture_sampler, vec2((uv.x + 1.0) / 2.0, (uv.y + f32(effect)) / 4.0));
+    var color = textureSample(player_effect_texture, player_effect_texture_sampler, vec2((uv.x + 2.0) / 4.0, (uv.y + f32(effect)) / 8.0));
 
     if (material.sides[side_index].x == material.sides[(side_index + 1) % 4].x) {
         return color;
@@ -89,32 +114,31 @@ fn mix_colors(a: vec4<f32>, b: vec4<f32>) -> vec4<f32> {
 
 @fragment
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
-    var output_color: vec4<f32> = material.color;
-    if ((material.flags & COLOR_MATERIAL_FLAGS_TEXTURE_BIT) != 0u) {
-        var texture_color = textureSample(texture, texture_sampler, in.uv);
-        if ((material.flags & COLOR_MATERIAL_FLAGS_EMISSIVE_BIT) != 0u) {
-            let emissive = textureSample(emissive, emissive_sampler, in.uv);
-            texture_color = texture_color + vec4(emissive.rgb * emissive.a, 0.0) * 5.0;
-        }
-#ifdef VERTEX_COLORS
-        output_color = output_color * texture_color * in.color;
-#else
-        output_color = output_color * texture_color;
-#endif
-        if ((material.flags & COLOR_MATERIAL_FLAGS_OVERLAY_BIT) != 0u) {
-            let overlay = textureSample(overlay, overlay_sampler, in.uv);
-            output_color = vec4(output_color.rgb * (1.0 - overlay.w) + overlay.rgb * overlay.w, output_color.w);
-        }
+    var output_color: vec4<f32> = vec4(0.0);
+    var uv = (in.uv * 2.0 - 0.5);
 
-        output_color = mix_colors(output_color, get_effect_color(0, in.uv));
-        output_color = mix_colors(output_color, get_effect_color(1, in.uv));
-        output_color = mix_colors(output_color, get_effect_color(2, in.uv));
-        output_color = mix_colors(output_color, get_effect_color(3, in.uv));
+    let texture_color = textureSample(texture, texture_sampler, (uv - 0.5) * 0.999 + 0.5);
 
-        output_color = mix_colors(output_color, get_effect_corner_color(0, in.uv));
-        output_color = mix_colors(output_color, get_effect_corner_color(1, in.uv));
-        output_color = mix_colors(output_color, get_effect_corner_color(2, in.uv));
-        output_color = mix_colors(output_color, get_effect_corner_color(3, in.uv));
+    if uv.x > 0.0 && uv.y >= 0.0 && uv.x <= 1.0 && uv.y <= 1.0 {
+        output_color = texture_color;
+
+        output_color = mix_colors(output_color, get_effect_color(0, uv));
+        output_color = mix_colors(output_color, get_effect_color(1, uv));
+        output_color = mix_colors(output_color, get_effect_color(2, uv));
+        output_color = mix_colors(output_color, get_effect_color(3, uv));
+
+        output_color = mix_colors(output_color, get_effect_corner_color(0, uv));
+        output_color = mix_colors(output_color, get_effect_corner_color(1, uv));
+        output_color = mix_colors(output_color, get_effect_corner_color(2, uv));
+        output_color = mix_colors(output_color, get_effect_corner_color(3, uv));
+    } else if uv.y > 1.0 {
+        output_color = get_effect_addon_color(0, vec2(uv.x, uv.y - 1.0));
+    } else if uv.x > 1.0 {
+        output_color = get_effect_addon_color(1, vec2(uv.x - 1.0, uv.y));
+    } else if uv.y < 0.0 {
+        output_color = get_effect_addon_color(2, vec2(uv.x, uv.y - 1.0));
+    } else if uv.x < 0.0 {
+        output_color = get_effect_addon_color(3, vec2(uv.x + 1.0, uv.y));
     }
 
     if (output_color.a < 0.01) {

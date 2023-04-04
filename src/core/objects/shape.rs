@@ -22,7 +22,7 @@ pub enum PlayerShape {
     Hexagon,
 }
 
-pub const MAX_SIDES: usize = 10;
+pub const MAX_SIDES: usize = 4;
 
 impl PlayerShape {
     pub fn get_default_material(&self) -> ColorMaterial {

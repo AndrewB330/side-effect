@@ -1,10 +1,10 @@
+use crate::core::objects::shape::MAX_SIDES;
 use bevy::asset::LoadState;
 use bevy::prelude::*;
 use bevy::reflect::TypeUuid;
 use bevy::render::render_asset::RenderAssets;
 use bevy::render::render_resource::{AsBindGroup, AsBindGroupShaderType, ShaderRef, ShaderType};
 use bevy::sprite::Material2d;
-use crate::core::objects::shape::MAX_SIDES;
 
 #[derive(AsBindGroup, Debug, Clone, TypeUuid)]
 #[uuid = "e228a544-e3ca-4e1e-ba9d-4d8bc1ad8c19"]

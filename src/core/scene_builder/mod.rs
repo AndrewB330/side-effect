@@ -1,8 +1,11 @@
+use crate::core::materials::bonus_material::BonusMaterial;
+use crate::core::materials::monster_material::MonsterMaterial;
 use crate::core::materials::player_material::PlayerMaterial;
 use crate::core::objects::shape::PlayerShapeVisualBundleCache;
 use bevy::prelude::*;
 
 mod bonus;
+mod monster;
 mod player;
 mod wall;
 
@@ -11,6 +14,8 @@ pub struct SceneBuilder<'w, 's, 'a> {
     meshes: ResMut<'a, Assets<Mesh>>,
     materials: ResMut<'a, Assets<ColorMaterial>>,
     player_materials: ResMut<'a, Assets<PlayerMaterial>>,
+    bonus_materials: ResMut<'a, Assets<BonusMaterial>>,
+    monster_materials: ResMut<'a, Assets<MonsterMaterial>>,
     psv: ResMut<'a, PlayerShapeVisualBundleCache>,
     asset_server: Res<'a, AssetServer>,
 }
@@ -26,6 +31,8 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
         meshes: ResMut<'a, Assets<Mesh>>,
         materials: ResMut<'a, Assets<ColorMaterial>>,
         player_materials: ResMut<'a, Assets<PlayerMaterial>>,
+        bonus_materials: ResMut<'a, Assets<BonusMaterial>>,
+        monster_materials: ResMut<'a, Assets<MonsterMaterial>>,
         psv: ResMut<'a, PlayerShapeVisualBundleCache>,
     ) -> SceneBuilder<'w, 's, 'a> {
         SceneBuilder {
@@ -33,6 +40,8 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
             meshes,
             materials,
             player_materials,
+            bonus_materials,
+            monster_materials,
             psv,
             asset_server,
         }

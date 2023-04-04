@@ -10,6 +10,8 @@ use crate::core::objects::shape::PlayerShapeVisualBundleCache;
 use crate::core::objects::side_effect::SideEffect;
 use bevy::core_pipeline::tonemapping::Tonemapping;
 
+use crate::core::materials::bonus_material::BonusMaterial;
+use crate::core::materials::monster_material::MonsterMaterial;
 use std::env;
 
 pub struct SideEffectGamePlugin;
@@ -48,6 +50,8 @@ fn setup_dev(
     meshes: ResMut<Assets<Mesh>>,
     materials: ResMut<Assets<ColorMaterial>>,
     player_materials: ResMut<Assets<PlayerMaterial>>,
+    bonus_materials: ResMut<Assets<BonusMaterial>>,
+    monster_materials: ResMut<Assets<MonsterMaterial>>,
     psv: ResMut<PlayerShapeVisualBundleCache>,
     mut next_game_state: ResMut<NextState<GameWorldState>>,
 ) {
@@ -57,15 +61,25 @@ fn setup_dev(
         meshes,
         materials,
         player_materials,
+        bonus_materials,
+        monster_materials,
         psv,
     );
 
     scene_builder.spawn_player(Vec2::new(0.0, 1.0), 0);
-    scene_builder.spawn_effect_bonus(Vec2::new(2.0, -1.75), SideEffect::Sticky);
+    /*scene_builder.spawn_effect_bonus(Vec2::new(2.0, -1.75), SideEffect::Sticky);
     scene_builder.spawn_effect_bonus(Vec2::new(3.0, -1.75), SideEffect::Shield);
     scene_builder.spawn_effect_bonus(Vec2::new(4.0, -1.75), SideEffect::Slippery);
-    scene_builder.spawn_effect_bonus(Vec2::new(5.0, -1.75), SideEffect::Shield);
+    scene_builder.spawn_effect_bonus(Vec2::new(5.0, -1.75), SideEffect::Shield);*/
+    scene_builder.spawn_effect_bonus(Vec2::new(2.0, -1.2), SideEffect::Thorns);
+    scene_builder.spawn_effect_bonus(Vec2::new(3.0, -1.2), SideEffect::Flashlight);
+    scene_builder.spawn_effect_bonus(Vec2::new(4.0, -1.2), SideEffect::Laser);
+    scene_builder.spawn_effect_bonus(Vec2::new(5.0, -1.2), SideEffect::Spring);
+
+    scene_builder.spawn_monster(Vec2::new(2.0, 1.2));
+
     scene_builder.spawn_wall_from_to(Vec2::new(-2.0, -2.0), Vec2::new(5.0, -3.0));
+    scene_builder.spawn_wall_from_to(Vec2::new(2.0, 0.0), Vec2::new(5.0, -0.5));
     scene_builder.spawn_wall_from_to(Vec2::new(-3.0, -2.0), Vec2::new(-2.0, 2.0));
 
     next_game_state.set(GameWorldState::GameWorld);

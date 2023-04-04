@@ -24,7 +24,9 @@ impl Bonus {
         let mut nearest_side = None;
 
         for i in 0..centers.len() {
-            let dist = pt.transform_point(centers[i].extend(0.0)).distance(bt.translation);
+            let dist = pt
+                .transform_point(centers[i].extend(0.0))
+                .distance(bt.translation);
             if dist < nearest_dist && player.effects[i] == SideEffect::None {
                 nearest_dist = dist;
                 nearest_side = Some(i);

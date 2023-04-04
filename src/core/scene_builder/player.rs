@@ -1,12 +1,14 @@
 use crate::core::materials::player_material::PlayerMaterial;
 use crate::core::objects::player::Player;
+use crate::core::objects::player::PlayerState;
 use crate::core::objects::shape::{PlayerShape, PlayerShapeVisualBundle, MAX_SIDES};
 use crate::core::objects::side_effect::SideEffect;
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
+use std::f32::consts::PI;
 
-use bevy_rapier2d::prelude::*;
 use crate::core::objects::collision_groups::PLAYER_CG;
+use bevy_rapier2d::prelude::*;
 
 #[derive(Bundle)]
 pub struct PlayerBundle {
@@ -29,17 +31,12 @@ pub struct PlayerBundle {
 
 impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
     pub fn spawn_player(&mut self, position: Vec2, id: u32) {
-        let player = Player {
+        let mut player = Player {
             id,
-            current_shape_index: 0,
-            time_since_move: 0.0,
-            time_since_spin: 0.0,
-            time_since_landed: 0.0,
-            time_since_in_air: 0.0,
-            time_since_jump: 0.0,
-            available_shapes: vec![PlayerShape::Square],
             effects: [SideEffect::None; MAX_SIDES],
+            side_entities: [None; MAX_SIDES],
             small_collider: Collider::round_cuboid(0.4, 0.4, 0.075),
+            ..default()
         };
 
         let player_material = PlayerMaterial {
@@ -51,7 +48,36 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
             player_effect_texture: self.asset_server.load("images/effect.png"),
         };
 
-        let parent = self.commands.spawn(PlayerBundle {
+        let parent = self.commands.spawn({}).id();
+
+        let directions = player.get_side_directions();
+
+        for i in 0..MAX_SIDES {
+            let child = self
+                .commands
+                .spawn((
+                    VisibilityBundle::default(),
+                    TransformBundle::from_transform(
+                        Transform::from_translation(directions[i].extend(0.0) * 0.475)
+                            .with_rotation(Quat::from_axis_angle(Vec3::Z, PI * 0.5 * i as f32)),
+                    ),
+                    Collider::round_cuboid(0.45, 0.01, 0.01),
+                    Friction {
+                        coefficient: 0.3,
+                        combine_rule: CoefficientCombineRule::Min,
+                    },
+                    Restitution {
+                        coefficient: 0.0,
+                        combine_rule: CoefficientCombineRule::Max,
+                    },
+                    PLAYER_CG,
+                ))
+                .id();
+            player.side_entities[i] = Some(child);
+            self.commands.entity(parent).add_child(child);
+        }
+
+        self.commands.entity(parent).insert(PlayerBundle {
             player,
             rigid_body: RigidBody::Dynamic,
             velocity: Default::default(),
@@ -60,7 +86,7 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
             mass: Default::default(),
             collision_groups: PLAYER_CG,
             friction: Friction {
-                coefficient: 0.9,
+                coefficient: 0.3,
                 combine_rule: CoefficientCombineRule::Max,
             },
             visibility: VisibilityBundle::default(),
@@ -73,28 +99,11 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
             visual: PlayerShapeVisualBundle {
                 mesh: self
                     .meshes
-                    .add(PlayerShape::Square.get_default_mesh())
+                    .add(shape::Quad::new(Vec2::new(2.0, 2.0)).into())
                     .into(),
                 material: self.player_materials.add(player_material),
-                collider: Collider::round_cuboid(0.4, 0.4, 0.1),
+                collider: Collider::round_cuboid(0.4, 0.4, 0.075),
             },
-        }).id();
-
-        let child = self.commands.spawn((
-             VisibilityBundle::default(),
-            TransformBundle::from_transform(Transform::from_xyz(
-                0.0,
-                0.5,
-                0.0,
-            )),
-            Collider::round_cuboid(0.4, 0.01, 0.05),
-             Friction {
-                coefficient: 0.01,
-                combine_rule: CoefficientCombineRule::Min,
-            },
-             PLAYER_CG
-        )).id();
-
-        self.commands.entity(parent).add_child(child);
+        });
     }
 }

@@ -1,5 +1,9 @@
+use crate::core::materials::bonus_material::BonusMaterial;
+use crate::core::materials::monster_material::MonsterMaterial;
 use crate::core::materials::player_material::PlayerMaterial;
+use crate::core::materials::update_materials;
 use crate::core::objects::shape::ShapePlugin;
+use crate::states::GameWorldState;
 use bevy::prelude::*;
 use bevy::sprite::Material2dPlugin;
 use bevy_prototype_debug_lines::DebugLinesPlugin;
@@ -30,8 +34,12 @@ impl Plugin for CorePlugin {
         app.add_plugin(DebugLinesPlugin::default());
         app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
         app.add_plugin(Material2dPlugin::<PlayerMaterial>::default());
+        app.add_plugin(Material2dPlugin::<BonusMaterial>::default());
+        app.add_plugin(Material2dPlugin::<MonsterMaterial>::default());
         app.add_plugin(PlayerPlugin);
         app.add_plugin(ShapePlugin);
         app.add_plugin(BonusPlugin);
+
+        app.add_systems((update_materials.run_if(in_state(GameWorldState::GameWorld)),));
     }
 }

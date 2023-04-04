@@ -15,6 +15,8 @@ pub enum SideEffect {
     Flashlight,
     //
     Laser,
+    //
+    Spring,
 }
 
 impl SideEffect {
@@ -27,6 +29,7 @@ impl SideEffect {
             SideEffect::Thorns => 4,
             SideEffect::Flashlight => 5,
             SideEffect::Laser => 6,
+            SideEffect::Spring => 7,
         }
     }
 }

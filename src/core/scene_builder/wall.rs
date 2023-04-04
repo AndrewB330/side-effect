@@ -1,8 +1,8 @@
+use crate::core::objects::collision_groups::WALL_CG;
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
 use bevy::sprite::MaterialMesh2dBundle;
 use bevy_rapier2d::prelude::*;
-use crate::core::objects::collision_groups::WALL_CG;
 
 #[derive(Component, Default, Debug)]
 pub struct Wall;
