@@ -1,9 +1,9 @@
-use crate::core::objects::bonus::Bonus;
 
-use crate::core::materials::bonus_material::BonusMaterial;
+
+
 use crate::core::materials::monster_material::MonsterMaterial;
 use crate::core::objects::collision_groups::BONUS_CG;
-use crate::core::objects::side_effect::SideEffect;
+
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
 use bevy::sprite::Mesh2dHandle;

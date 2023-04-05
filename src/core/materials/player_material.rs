@@ -1,5 +1,5 @@
 use crate::core::objects::shape::MAX_SIDES;
-use bevy::asset::LoadState;
+
 use bevy::prelude::*;
 use bevy::reflect::TypeUuid;
 use bevy::render::render_asset::RenderAssets;
@@ -30,7 +30,7 @@ pub struct PlayerMaterial {
     pub player_effect_texture: Handle<Image>,
 }
 
-/// The GPU representation of the uniform data of a [`ColorMaterialCustom`].
+// The GPU representation of the uniform data of a [`ColorMaterialCustom`].
 #[derive(Clone, Default, ShaderType)]
 pub struct PlayerMaterialUniform {
     pub color: Vec4,

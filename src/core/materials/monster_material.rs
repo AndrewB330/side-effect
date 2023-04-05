@@ -1,9 +1,9 @@
-use crate::core::objects::shape::MAX_SIDES;
-use bevy::asset::LoadState;
+
+
 use bevy::prelude::*;
 use bevy::reflect::TypeUuid;
-use bevy::render::render_asset::RenderAssets;
-use bevy::render::render_resource::{AsBindGroup, AsBindGroupShaderType, ShaderRef, ShaderType};
+
+use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 use bevy::sprite::Material2d;
 
 #[derive(AsBindGroup, Debug, Clone, TypeUuid)]

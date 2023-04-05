@@ -17,10 +17,10 @@ pub fn update_materials(
     mut monster_materials: ResMut<Assets<MonsterMaterial>>,
 ) {
     for h in &player_handles {
-        if let Some(m) = player_materials.get_mut(h) {}
+        if let Some(_m) = player_materials.get_mut(h) {}
     }
     for h in &bonus_handles {
-        if let Some(m) = bonus_materials.get_mut(h) {}
+        if let Some(_m) = bonus_materials.get_mut(h) {}
     }
     for h in &monster_handles {
         if let Some(m) = monster_materials.get_mut(h) {

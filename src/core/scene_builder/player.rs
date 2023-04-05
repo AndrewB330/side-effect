@@ -1,7 +1,7 @@
 use crate::core::materials::player_material::PlayerMaterial;
 use crate::core::objects::player::Player;
-use crate::core::objects::player::PlayerState;
-use crate::core::objects::shape::{PlayerShape, PlayerShapeVisualBundle, MAX_SIDES};
+
+use crate::core::objects::shape::{PlayerShapeVisualBundle, MAX_SIDES};
 use crate::core::objects::side_effect::SideEffect;
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;

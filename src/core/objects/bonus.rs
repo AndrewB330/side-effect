@@ -1,6 +1,6 @@
 use crate::{core::objects::side_effect::SideEffect, states::GameWorldState};
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::{CollisionEvent, RapierContext};
+use bevy_rapier2d::prelude::{CollisionEvent};
 
 use super::player::Player;
 
@@ -52,7 +52,7 @@ pub fn bonus_pickup(
     mut bonuses: Query<(Entity, &Transform, &mut Bonus)>,
 ) {
     for collision_event in collision_events.iter() {
-        if let CollisionEvent::Started(a, b, args) = collision_event {
+        if let CollisionEvent::Started(a, b, _args) = collision_event {
             if let Ok((pt, mut player)) = players.get_mut(*a) {
                 if let Ok((_, bt, mut bonus)) = bonuses.get_mut(*b) {
                     bonus.apply_to(&mut player, pt, bt);

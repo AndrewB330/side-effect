@@ -3,10 +3,10 @@ use std::f32::consts::PI;
 
 use crate::states::GameWorldState;
 use bevy::prelude::*;
-use bevy_prototype_debug_lines::DebugLines;
 
-use crate::core::objects::collision_groups::PLAYER_CG;
-use crate::core::objects::shape::{PlayerShape, PlayerShapeVisualBundleCache, MAX_SIDES};
+
+
+use crate::core::objects::shape::{MAX_SIDES};
 use crate::core::objects::side_effect::SideEffect;
 
 use crate::core::materials::player_material::PlayerMaterial;
@@ -147,7 +147,7 @@ impl Player {
 }
 
 fn update_side_effects(
-    mut players: Query<(&Player, &Handle<PlayerMaterial>), Changed<Player>>,
+    players: Query<(&Player, &Handle<PlayerMaterial>), Changed<Player>>,
     mut materials: ResMut<Assets<PlayerMaterial>>,
 ) {
     for (player, handle) in &players {
@@ -216,7 +216,7 @@ fn move_player(
         player.time_since_last_spin += time.delta_seconds();
         player.time_since_last_jump += time.delta_seconds();
 
-        /// Move left-right
+        // Move left-right
         {
             let mut target_velocity = 0.0;
             let right = gravity_direction.get_vec().perp();
@@ -233,7 +233,7 @@ fn move_player(
 
             let mut delta_velocity = target_velocity - velocity.linvel.dot(right);
 
-            /// For more "snappy" moves
+            // For more "snappy" moves
             let bonus = ((delta_velocity.abs() - player.get_max_speed()) / player.get_max_speed())
                 .clamp(0.0, 2.0);
 
@@ -258,7 +258,7 @@ fn move_player(
             }
         }
 
-        /// Schedule spin
+        // Schedule spin
         let force_jump = {
             if keys.just_pressed(KeyCode::W) {
                 player.delayed_spin_torque = Some(3.0);
@@ -271,7 +271,7 @@ fn move_player(
             }
         };
 
-        /// Spin
+        // Spin
         {
             if player.in_air_state.time_since_activated() > 0.02 {
                 if let Some(torque) = player.delayed_spin_torque.take() {
@@ -286,7 +286,7 @@ fn move_player(
             }
         }
 
-        /// Snap to 90-s angles
+        // Snap to 90-s angles
         {
             let angle: f32 =
                 (get_angle_from_quat(transform.rotation) % (2.0 * PI) + 2.0 * PI) % (2.0 * PI);
@@ -312,7 +312,7 @@ fn move_player(
             impulse.torque_impulse -= 0.2 * velocity.angvel * mass.0.principal_inertia * multiplier;
         }
 
-        /// Jump
+        // Jump
         {
             let collider_below = find_obstacle(
                 entity,
@@ -360,7 +360,7 @@ fn move_player(
 
                     let mut dir = -gravity_direction.get_vec();
 
-                    /// Side jump if stick to wall
+                    // Side jump if stick to wall
                     if collider_right.is_some()
                         && player.stick_to_wall_state.time_since_activated() > 0.05
                     {
@@ -368,7 +368,7 @@ fn move_player(
                         dir += -gravity_direction.get_vec().perp() * 0.5;
                     }
 
-                    /// Side jump if stick to wall
+                    // Side jump if stick to wall
                     if collider_left.is_some()
                         && player.stick_to_wall_state.time_since_activated() > 0.05
                     {
