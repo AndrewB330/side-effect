@@ -4,6 +4,7 @@ use std::f32::consts::PI;
 use crate::states::GameWorldState;
 use bevy::prelude::*;
 
+use crate::core::objects::collision_groups::PLAYER_CG;
 use crate::core::objects::shape::MAX_SIDES;
 use crate::core::objects::side_effect::SideEffect;
 
@@ -119,7 +120,7 @@ impl Player {
     }
 
     pub fn get_jump_impulse(&self) -> f32 {
-        4.0
+        5.5
     }
 
     pub fn get_friction(&self) -> f32 {
@@ -196,6 +197,7 @@ fn move_player(
         &mut Player,
         &Transform,
     )>,
+    mut objects: Query<(&mut ExternalImpulse, &Transform, &ReadMassProperties), Without<Player>>,
     keys: Res<Input<KeyCode>>,
     time: Res<Time>,
     config: ResMut<RapierConfiguration>,
@@ -414,19 +416,22 @@ fn move_player(
                             20.0
                         };
 
-                        let offset = if keys.pressed(KeyCode::A) {
-                            Vec2::ZERO
-                        } else if keys.pressed(KeyCode::D) {
-                            Vec2::ZERO
-                        } else {
-                            Vec2::ZERO
-                        }; // + dir * 0.4;
-
+                        // Apply impulse to player
                         *impulse += ExternalImpulse::at_point(
                             dir * stick_force * mass.0.mass * time.delta_seconds(),
-                            transform.translation.truncate() + offset,
+                            transform.translation.truncate(),
                             transform.translation.truncate(),
                         );
+                        // Apply impulse to other body
+                        if let Ok((mut impulse2, transform2, mass2)) =
+                            objects.get_mut(collider_nearby.unwrap().0)
+                        {
+                            *impulse2 += ExternalImpulse::at_point(
+                                -dir * stick_force * mass2.0.mass * time.delta_seconds(),
+                                transform.translation.truncate(),
+                                transform2.translation.truncate(),
+                            );
+                        }
                     }
                 }
                 SideEffect::Slippery => {
@@ -466,7 +471,7 @@ fn find_obstacle(
     toi: f32,
 ) -> Option<(Entity, f32)> {
     let filter = QueryFilter::new()
-        .groups(CollisionGroups::new(Group::GROUP_2, Group::GROUP_1))
+        .groups(PLAYER_CG)
         .exclude_collider(entity);
     context
         .cast_shape(

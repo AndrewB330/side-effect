@@ -14,7 +14,7 @@ pub struct MonsterMaterial {
     pub animation_tick: u32,
 
     #[uniform(2)]
-    pub overlay: u32,
+    pub state: u32,
 
     #[texture(3)]
     #[sampler(4)]

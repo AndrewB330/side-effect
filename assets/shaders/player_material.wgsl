@@ -116,8 +116,9 @@ fn mix_colors(a: vec4<f32>, b: vec4<f32>) -> vec4<f32> {
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
     var output_color: vec4<f32> = vec4(0.0);
     var uv = (in.uv * 2.0 - 0.5);
+    uv = (uv - 0.5) * 0.999 + 0.5;
 
-    let texture_color = textureSample(texture, texture_sampler, (uv - 0.5) * 0.999 + 0.5);
+    let texture_color = textureSample(texture, texture_sampler, uv);
 
     if uv.x > 0.0 && uv.y >= 0.0 && uv.x <= 1.0 && uv.y <= 1.0 {
         output_color = texture_color;

@@ -2,6 +2,7 @@ use crate::core::materials::bonus_material::BonusMaterial;
 use crate::core::materials::monster_material::MonsterMaterial;
 use crate::core::materials::player_material::PlayerMaterial;
 use crate::core::materials::update_materials;
+use crate::core::objects::monster::MonsterPlugin;
 use crate::core::objects::shape::ShapePlugin;
 use crate::states::GameWorldState;
 use bevy::prelude::*;
@@ -35,12 +36,20 @@ impl Plugin for CorePlugin {
         });
 
         app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
+        app.add_plugin(RapierDebugRenderPlugin {
+            style: DebugRenderStyle {
+                rigid_body_axes_length: 0.3,
+                ..default()
+            },
+            ..default()
+        });
 
         app.add_plugin(Material2dPlugin::<PlayerMaterial>::default());
         app.add_plugin(Material2dPlugin::<BonusMaterial>::default());
         app.add_plugin(Material2dPlugin::<MonsterMaterial>::default());
 
         app.add_plugin(PlayerPlugin);
+        app.add_plugin(MonsterPlugin);
         app.add_plugin(ShapePlugin);
         app.add_plugin(BonusPlugin);
 

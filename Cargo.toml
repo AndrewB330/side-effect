@@ -10,3 +10,4 @@ bevy = { version = "0.10.0" }
 bevy_rapier2d = "0.21.0"
 bitflags = "2.0.2"
 bevy_prototype_debug_lines = "0.10"
+rand = "0.8.5"

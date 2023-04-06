@@ -81,9 +81,11 @@ fn setup_dev(
 
     scene_builder.spawn_monster(Vec2::new(2.0, 1.2));
 
-    scene_builder.spawn_wall_from_to(Vec2::new(-2.0, -2.0), Vec2::new(5.0, -3.0));
-    scene_builder.spawn_wall_from_to(Vec2::new(2.0, 0.0), Vec2::new(5.0, -0.5));
-    scene_builder.spawn_wall_from_to(Vec2::new(-3.0, -2.0), Vec2::new(-2.0, 2.0));
+    scene_builder.spawn_wall_from_to(Vec2::new(-5.0, -2.0), Vec2::new(5.0, -3.0));
+    //scene_builder.spawn_wall_from_to(Vec2::new(2.0, 0.0), Vec2::new(5.0, -0.5));
+    scene_builder.spawn_wall_from_to(Vec2::new(-6.0, -2.0), Vec2::new(-5.0, 2.0));
+    scene_builder.spawn_wall_from_to(Vec2::new(5.0, -2.0), Vec2::new(6.0, 2.0));
+    scene_builder.spawn_wall_from_to(Vec2::new(2.0, -1.0), Vec2::new(3.0, -2.0));
 
     next_game_state.set(GameWorldState::GameWorld);
 }

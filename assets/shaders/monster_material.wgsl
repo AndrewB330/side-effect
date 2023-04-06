@@ -6,7 +6,7 @@ var<uniform> monster: u32;
 @group(1) @binding(1)
 var<uniform> animation_tick: u32;
 @group(1) @binding(2)
-var<uniform> overlay_index: u32;
+var<uniform> state: u32;
 @group(1) @binding(3)
 var texture: texture_2d<f32>;
 @group(1) @binding(4)
@@ -26,8 +26,12 @@ fn mix_colors(a: vec4<f32>, b: vec4<f32>) -> vec4<f32> {
 
 @fragment
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
-    let color = textureSample(texture, texture_sampler, vec2((in.uv.x + f32(animation_tick / 5u % 8u) + 2.0) / 10.0, (in.uv.y + f32(monster)) / 1.0));
-    let overlay = textureSample(texture, texture_sampler, vec2((in.uv.x + f32(overlay_index)) / 10.0, (in.uv.y + f32(monster)) / 1.0));
+    var uv = in.uv;
+    if ((state & 1u) == 0u) {
+        uv.x = 1.0 - uv.x;
+    }
+    let color = textureSample(texture, texture_sampler, vec2((uv.x + f32(animation_tick / 5u % 8u) + 2.0) / 10.0, (uv.y + f32(monster)) / 1.0));
+    let overlay = textureSample(texture, texture_sampler, vec2((uv.x + f32(state / 2u)) / 10.0, (uv.y + f32(monster)) / 1.0));
 
     return mix_colors(color, overlay);
 }

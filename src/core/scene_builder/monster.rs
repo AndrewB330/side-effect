@@ -1,21 +1,34 @@
 use crate::core::objects::collision_groups::BONUS_CG;
+use crate::core::objects::monster::Monster;
+use crate::core::scene_builder::SceneBuilder;
 use crate::core::{
     materials::monster_material::MonsterMaterial, objects::collision_groups::MONSTER_CG,
 };
-
-use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
 use bevy::sprite::Mesh2dHandle;
-use bevy_rapier2d::prelude::{ActiveEvents, Collider, LockedAxes, RigidBody, Sensor};
+use bevy_rapier2d::prelude::*;
 
 impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
     pub fn spawn_monster(&mut self, position: Vec2) {
         let monster_material = MonsterMaterial {
             monster_index: 0,
             animation_tick: 0,
-            overlay: 1,
+            state: 0,
             texture: Some(self.asset_server.load("images/monster.png")),
         };
+
+        let points = vec![
+            Vec2::new(0.3, -0.5),
+            Vec2::new(0.44, -0.2),
+            Vec2::new(0.44, 0.2),
+            Vec2::new(0.3, 0.5),
+            Vec2::new(-0.3, 0.5),
+            Vec2::new(-0.44, 0.2),
+            Vec2::new(-0.44, -0.2),
+            Vec2::new(-0.3, -0.5),
+        ];
+
+        let collider = Collider::convex_polyline(points).unwrap();
 
         self.commands.spawn((
             VisibilityBundle::default(),
@@ -32,8 +45,12 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
             RigidBody::Dynamic,
             ActiveEvents::COLLISION_EVENTS,
             LockedAxes::ROTATION_LOCKED,
-            Collider::cuboid(0.5, 0.5),
+            collider,
             MONSTER_CG,
+            ReadMassProperties::default(),
+            ExternalImpulse::default(),
+            Velocity::default(),
+            Monster { patrol: true },
         ));
     }
 }
