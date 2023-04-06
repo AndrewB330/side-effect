@@ -10,8 +10,11 @@ use bevy_prototype_debug_lines::DebugLinesPlugin;
 use bevy_rapier2d::prelude::*;
 use objects::player::PlayerPlugin;
 
+use self::camera::CameraPlugin;
 use self::objects::bonus::BonusPlugin;
+use self::scene_builder::scene_boundaries::SceneBoundaries;
 
+pub mod camera;
 pub mod direction;
 pub mod materials;
 pub mod objects;
@@ -31,14 +34,19 @@ impl Plugin for CorePlugin {
             ..default()
         });
 
-        app.add_plugin(DebugLinesPlugin::default());
         app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default());
+
         app.add_plugin(Material2dPlugin::<PlayerMaterial>::default());
         app.add_plugin(Material2dPlugin::<BonusMaterial>::default());
         app.add_plugin(Material2dPlugin::<MonsterMaterial>::default());
+
         app.add_plugin(PlayerPlugin);
         app.add_plugin(ShapePlugin);
         app.add_plugin(BonusPlugin);
+
+        app.add_plugin(CameraPlugin);
+
+        app.init_resource::<SceneBoundaries>();
 
         app.add_systems((update_materials.run_if(in_state(GameWorldState::GameWorld)),));
     }

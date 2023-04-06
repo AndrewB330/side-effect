@@ -1,6 +1,6 @@
 use crate::{core::objects::side_effect::SideEffect, states::GameWorldState};
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::{CollisionEvent};
+use bevy_rapier2d::prelude::CollisionEvent;
 
 use super::player::Player;
 

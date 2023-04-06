@@ -1,13 +1,12 @@
-
-
-
-use crate::core::materials::monster_material::MonsterMaterial;
 use crate::core::objects::collision_groups::BONUS_CG;
+use crate::core::{
+    materials::monster_material::MonsterMaterial, objects::collision_groups::MONSTER_CG,
+};
 
 use crate::core::scene_builder::SceneBuilder;
 use bevy::prelude::*;
 use bevy::sprite::Mesh2dHandle;
-use bevy_rapier2d::prelude::{ActiveEvents, Collider, RigidBody, Sensor};
+use bevy_rapier2d::prelude::{ActiveEvents, Collider, LockedAxes, RigidBody, Sensor};
 
 impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
     pub fn spawn_monster(&mut self, position: Vec2) {
@@ -30,11 +29,11 @@ impl<'w, 's, 'a> SceneBuilder<'w, 's, 'a> {
                 self.meshes
                     .add(shape::Quad::new(Vec2::new(1.0, 1.0)).into()),
             ),
-            RigidBody::Fixed,
-            Sensor,
+            RigidBody::Dynamic,
             ActiveEvents::COLLISION_EVENTS,
-            Collider::ball(0.5),
-            BONUS_CG,
+            LockedAxes::ROTATION_LOCKED,
+            Collider::cuboid(0.5, 0.5),
+            MONSTER_CG,
         ));
     }
 }

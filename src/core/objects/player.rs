@@ -4,9 +4,7 @@ use std::f32::consts::PI;
 use crate::states::GameWorldState;
 use bevy::prelude::*;
 
-
-
-use crate::core::objects::shape::{MAX_SIDES};
+use crate::core::objects::shape::MAX_SIDES;
 use crate::core::objects::side_effect::SideEffect;
 
 use crate::core::materials::player_material::PlayerMaterial;
